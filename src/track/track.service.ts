@@ -54,6 +54,7 @@ export class TrackService {
     if (!dbManager.trackExists(id)) {
       throw new HttpException('Unknown record', HttpStatus.NOT_FOUND)
     }
+    dbManager.deleteTrackRelation(id);
     return dbManager.deleteTrack(id);
   }
 }

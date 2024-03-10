@@ -1,6 +1,6 @@
 import dbAlbums, { Album, IAlbumData } from "./Albums";
 import dbArtists, { Artist, IArtistData } from "./Artists";
-import dbFavorites from "./Favorites";
+import dbFavorites, { IFavorites, favTypes } from "./Favorites";
 import dbTracks, { ITrackData, Track } from "./Tracks";
 import dbUsers, { IUserData, User } from "./Users";
 
@@ -59,6 +59,9 @@ class dbManager {
     deleteTrack(id: string): void {
         this.#dbTracks.deleteTrackById(id)
     }
+    deleteTrackRelation(trackId: string) {
+        this.#dbFavorites.deleteFavoriteByItemId(trackId)
+    }
 
     //Artists
     getAllArtists(): Artist[] {
@@ -82,6 +85,7 @@ class dbManager {
     deleteArtistRelation(artistId: string) {
         this.#dbAlbums.deleteArtistRelations(artistId);
         this.#dbTracks.deleteArtistRelations(artistId);
+        this.#dbFavorites.deleteFavoriteByItemId(artistId)
     }
 
     //Albums
@@ -105,11 +109,37 @@ class dbManager {
     }
     deleteAlbumRelation(albumId: string) {
         this.#dbTracks.deleteAlbumRelations(albumId);
+        this.#dbFavorites.deleteFavoriteByItemId(albumId)
     }
 
     //Favorites
-    getAllFavs(): any[] {
-        return []
+    addFav(itemId: string, itemType: favTypes): void {
+        return this.#dbFavorites.addItem('', itemId, itemType);
+    }
+    getAllFavs(): IFavorites {
+        const res = this.#dbFavorites.getAllFavorites();
+
+        return {
+            artists: res.artists.map(j => this.#dbArtists.getArtistById(j)).filter(i => i !== null),
+            albums: res.albums.map(j => this.#dbAlbums.getAlbumById(j)).filter(i => i !== null),
+            tracks: res.tracks.map(j => this.#dbTracks.getTrackById(j)).filter(i => i !== null),
+        }
+    }
+    getFavById(id: string): Album | Artist | Track | null {
+        const type = this.#dbFavorites.getFavTypeById(id);
+        if (type === null) return null;
+        switch (type as any) {
+            case type === favTypes.Album:
+                return this.#dbAlbums.getAlbumById(id);
+            case type === favTypes.Artist:
+                return this.#dbArtists.getArtistById(id);
+            case type === favTypes.Track:
+                return this.#dbTracks.getTrackById(id);
+            default: break;
+        }
+    }
+    deleteFavoriteById(id: string): Boolean {
+        return this.#dbFavorites.deleteFavoriteByItemId(id);
     }
 }
 export default new dbManager();
