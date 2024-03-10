@@ -60,7 +60,7 @@ class dbUsers {
     changeUser(id: string, userData: Partial<IUserData>): User | null {
         const userDb = this.#dbUsers.get(id);
         userDb.update(userData);
-        this.#dbUsers.set(id, userDb);//??
+        this.#dbUsers.set(id, userDb);
         return userDb;
     }
     getUserById(id: string): User | null {

@@ -15,14 +15,26 @@ class dbManager {
     getAllUsers(): User[] {
         return this.#dbUsers.getAllUsers();
     }
+    userExists(userId: string): Boolean {
+        return !!this.#dbUsers.getUserById(userId);
+    }
+    checkPassword(userId: string, oldPassword: string): Boolean {
+        return oldPassword === this.#dbUsers.getUserById(userId)?.password;
+    }
     getUserById(id: string): User | null {
-        return this.#dbUsers.getUserById(id);
+        const user = JSON.parse(JSON.stringify(this.#dbUsers.getUserById(id)));
+        delete user.password;
+        return user;
     }
     addUser(userdata: IUserData): User | null {
-        return this.#dbUsers.addUser(userdata);
+        const user = JSON.parse(JSON.stringify(this.#dbUsers.addUser(userdata)));
+        delete user.password;
+        return user;
     }
     updateUser(id: string, userdata: Partial<IUserData>): User | null {
-        return this.#dbUsers.changeUser(id, userdata);
+        const user = JSON.parse(JSON.stringify(this.#dbUsers.changeUser(id, userdata)));
+        delete user.password;
+        return user;
     }
     deleteUser(id: string): void {
         this.#dbUsers.deleteUserById(id);
@@ -31,6 +43,9 @@ class dbManager {
     //Tracks 
     getAllTracks(): Track[] {
         return this.#dbTracks.getAllTracks()
+    }
+    trackExists(trackId: string): Boolean {
+        return !!this.#dbTracks.getTrackById(trackId);
     }
     getTrackById(id: string): Track | null {
         return this.#dbTracks.getTrackById(id)
@@ -49,6 +64,9 @@ class dbManager {
     getAllArtists(): Artist[] {
         return this.#dbArtists.getAllArtists()
     }
+    artistExists(atristId: string): Boolean {
+        return !!this.#dbArtists.getArtistById(atristId);
+    }
     getArtistById(id: string): Artist | null {
         return this.#dbArtists.getArtistById(id)
     }
@@ -61,10 +79,17 @@ class dbManager {
     deleteArtist(id: string): void {
         this.#dbArtists.deleteArtistById(id)
     }
+    deleteArtistRelation(artistId: string) {
+        this.#dbAlbums.deleteArtistRelations(artistId);
+        this.#dbTracks.deleteArtistRelations(artistId);
+    }
 
     //Albums
     getAllAlbums(): Album[] {
         return this.#dbAlbums.getAllTracks()
+    }
+    albumExists(albumId: string): Boolean {
+        return !!this.#dbAlbums.getAlbumById(albumId);
     }
     getAlbumById(id: string): Album | null {
         return this.#dbAlbums.getAlbumById(id)
@@ -78,30 +103,13 @@ class dbManager {
     deleteAlbum(id: string) {
         this.#dbAlbums.deleteAlbumById(id);
     }
+    deleteAlbumRelation(albumId: string) {
+        this.#dbTracks.deleteAlbumRelations(albumId);
+    }
 
     //Favorites
     getAllFavs(): any[] {
         return []
-    }
-
-    artistExists(atristId: string): Boolean {
-        return !!this.#dbArtists.getArtistById(atristId);
-    }
-    userExists(userId: string): Boolean {
-        return !!this.#dbUsers.getUserById(userId);
-    }
-    albumExists(albumId: string): Boolean {
-        return !!this.#dbAlbums.getAlbumById(albumId);
-    }
-    trackExists(trackId: string): Boolean {
-        return !!this.#dbTracks.getTrackById(trackId);
-    }
-    deleteArtistRelation(artistId: string) {
-        this.#dbAlbums.deleteArtistRelations(artistId);
-        this.#dbTracks.deleteArtistRelations(artistId);
-    }
-    deleteAlbumRelation(albumId: string) {
-        this.#dbTracks.deleteAlbumRelations(albumId);
     }
 }
 export default new dbManager();
