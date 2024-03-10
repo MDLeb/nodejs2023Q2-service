@@ -24,7 +24,7 @@ export class Artist implements IArtist {
     update(artistdata: Partial<IArtistData>) {
         const {name, grammy} = artistdata;
         name && (this.name = name);
-        grammy && (this.grammy = grammy)
+        this.grammy = grammy;
     }
 }
 
@@ -50,7 +50,7 @@ class dbArtists {
         const artistDb = this.#dbArtists.get(id);
         if(!artistDb) return null;
         artistDb.update(artistdata);
-        this.#dbArtists.set(id, artistDb);//??
+        this.#dbArtists.set(id, artistDb);
         return artistDb;
     }
 }

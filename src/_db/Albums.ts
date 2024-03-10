@@ -14,7 +14,7 @@ export interface IAlbumData {
 }
 
 export class Album implements IAlbum {
-    id: string; 
+    id: string;
     name: string;
     year: number;
     artistId: string | null;
@@ -26,7 +26,7 @@ export class Album implements IAlbum {
         this.artistId = albumdata.artistId;
     }
     update(albumdata: Partial<IAlbumData>) {
-        const {name, year, artistId} = albumdata;
+        const { name, year, artistId } = albumdata;
         name && (this.name = name);
         year && (this.year = year)
         artistId && (this.artistId = artistId)
@@ -45,9 +45,9 @@ class dbAlbums {
     }
     updateAlbumById(id: string, albumdata: Partial<IAlbumData>): Album | null {
         const albumDb = this.#dbAlbums.get(id);
-        if(!albumDb) return null;
+        if (!albumDb) return null;
         albumDb.update(albumdata);
-        this.#dbAlbums.set(id, albumDb);//??
+        this.#dbAlbums.set(id, albumDb);
         return albumDb;
     }
     deleteAlbumById(id: string): dbAlbums {
@@ -56,6 +56,14 @@ class dbAlbums {
     }
     getAlbumById(id: string): Album | null {
         return this.#dbAlbums.get(id) ?? null;
+    }
+    deleteArtistRelations(artistId: string) {
+        Array
+            .from(this.#dbAlbums.values())
+            .filter((i) => i.artistId === artistId)
+            .forEach((j) => {
+                j.artistId = null;
+            })
     }
 }
 

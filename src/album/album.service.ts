@@ -1,8 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateAlbumDto } from './dto/create-album.dto';
 import { UpdateAlbumDto } from './dto/update-album.dto';
 import dbManager from 'src/_db/dbManager';
 import { IAlbumData } from 'src/_db/Albums';
+import { isUUID } from '../utils/isUUID';
 
 @Injectable()
 export class AlbumService {
@@ -20,10 +21,24 @@ export class AlbumService {
   }
 
   findOne(id: string) {
+    if (!isUUID(id)) {
+      throw new HttpException('Wrong id', HttpStatus.BAD_REQUEST)
+    }
+    if (!dbManager.albumExists(id)) {
+      throw new HttpException('Unknown record', HttpStatus.NOT_FOUND)
+    }
+    
     return dbManager.getAlbumById(id);
   }
 
   update(id: string, updateAlbumDto: UpdateAlbumDto) {
+    if (!isUUID(id)) {
+      throw new HttpException('Wrong id', HttpStatus.BAD_REQUEST)
+    }
+    if (!dbManager.albumExists(id)) {
+      throw new HttpException('Unknown record', HttpStatus.NOT_FOUND)
+    }
+
     let albumData: IAlbumData = {
       name: updateAlbumDto.name ?? null,
       artistId: updateAlbumDto.artistId ?? null,
@@ -33,6 +48,14 @@ export class AlbumService {
   }
 
   remove(id: string) {
-    return dbManager.deleteAlbum(id);
+    if (!isUUID(id)) {
+      throw new HttpException('Wrong id', HttpStatus.BAD_REQUEST)
+    }
+    if (!dbManager.albumExists(id)) {
+      throw new HttpException('Unknown record', HttpStatus.NOT_FOUND)
+    }
+
+    dbManager.deleteAlbum(id);
+    dbManager.deleteAlbumRelation(id);
   }
 }

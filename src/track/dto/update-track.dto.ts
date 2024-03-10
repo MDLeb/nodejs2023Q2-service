@@ -11,12 +11,12 @@ export class UpdateTrackDto extends PartialType(CreateTrackDto) {
     @IsNotEmpty()
     @IsOptional()
     @IsString()
-    artistId: string;
+    artistId: string | null;
 
     @IsNotEmpty()
     @IsOptional()
     @IsString()
-    albumId: string;
+    albumId: string | null;
 
     @IsNotEmpty()
     @IsOptional()

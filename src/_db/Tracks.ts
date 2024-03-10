@@ -30,7 +30,7 @@ export class Track implements ITrack {
         this.duration = trackdata.duration;
     }
     update(trackdata: Partial<ITrackData>) {
-        const {name, artistId, albumId, duration} = trackdata;
+        const { name, artistId, albumId, duration } = trackdata;
         name && (this.name = name);
         artistId && (this.artistId = artistId)
         albumId && (this.albumId = albumId)
@@ -51,7 +51,7 @@ class dbTracks {
     }
     updateTrackById(id: string, trackdata: Partial<ITrack>): Track | null {
         const trackDb = this.#dbTracks.get(id);
-        if(!trackDb) return null;
+        if (!trackDb) return null;
         trackDb.update(trackdata);
         this.#dbTracks.set(id, trackDb);//??
         return trackDb;
@@ -72,6 +72,24 @@ class dbTracks {
         return Array
             .from(this.#dbTracks.values())
             .filter(i => i.albumId === id);
+    }
+
+    deleteArtistRelations(artistId: string) {
+       Array
+            .from(this.#dbTracks.values())
+            .filter((i) => i.artistId === artistId)
+            .forEach((j) => {
+                j.artistId = null;
+            })
+    }
+
+    deleteAlbumRelations(albumId: string) {
+        Array
+            .from(this.#dbTracks.values())
+            .filter((i) => i.albumId === albumId)
+            .forEach((j) => {
+                j.albumId = null;
+            })
     }
 }
 

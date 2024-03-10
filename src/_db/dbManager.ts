@@ -83,5 +83,25 @@ class dbManager {
     getAllFavs(): any[] {
         return []
     }
+
+    artistExists(atristId: string): Boolean {
+        return !!this.#dbArtists.getArtistById(atristId);
+    }
+    userExists(userId: string): Boolean {
+        return !!this.#dbUsers.getUserById(userId);
+    }
+    albumExists(albumId: string): Boolean {
+        return !!this.#dbAlbums.getAlbumById(albumId);
+    }
+    trackExists(trackId: string): Boolean {
+        return !!this.#dbTracks.getTrackById(trackId);
+    }
+    deleteArtistRelation(artistId: string) {
+        this.#dbAlbums.deleteArtistRelations(artistId);
+        this.#dbTracks.deleteArtistRelations(artistId);
+    }
+    deleteAlbumRelation(albumId: string) {
+        this.#dbTracks.deleteAlbumRelations(albumId);
+    }
 }
 export default new dbManager();

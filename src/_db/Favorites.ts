@@ -23,7 +23,7 @@ class dbFavorites {
 
     addItem(userId: string, item: Album | Artist | Track): dbFavorites {
         const recordId = uuid.v4();
-        let itemType;
+        let itemType: favTypes;
         switch (item as any) {
             case item instanceof Album:
                 itemType = favTypes.Album;
