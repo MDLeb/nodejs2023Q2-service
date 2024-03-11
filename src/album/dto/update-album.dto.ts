@@ -3,18 +3,17 @@ import { CreateAlbumDto } from './create-album.dto';
 import { IsNotEmpty, IsString, IsNumber, IsOptional } from 'class-validator';
 
 export class UpdateAlbumDto extends PartialType(CreateAlbumDto) {
+  @IsNotEmpty()
+  @IsString()
+  @IsOptional()
+  name: string;
 
-    @IsNotEmpty()
-    @IsString()
-    @IsOptional()
-    name: string;
+  @IsNotEmpty()
+  @IsNumber()
+  @IsOptional()
+  year: number;
 
-    @IsNotEmpty()
-    @IsNumber()
-    @IsOptional()
-    year: number;
-
-    @IsString()
-    @IsOptional()
-    artistId: string | null;
+  @IsString()
+  @IsOptional()
+  artistId: string | null;
 }

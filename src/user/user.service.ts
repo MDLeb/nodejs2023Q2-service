@@ -8,10 +8,13 @@ import { isUUID } from '../utils/isUUID';
 @Injectable()
 export class UserService {
   create(createUserDto: CreateUserDto) {
-    let userData: IUserData = {
+    const userData: IUserData = {
       login: createUserDto.login,
-      password: createUserDto.password
+      password: createUserDto.password,
     };
+    if (!dbManager.isUniqLogin(userData.login)) {
+      throw new HttpException('Not unique login', HttpStatus.FORBIDDEN);
+    }
     return dbManager.addUser(userData);
   }
 
@@ -21,37 +24,37 @@ export class UserService {
 
   findOne(id: string) {
     if (!isUUID(id)) {
-      throw new HttpException('Wrong id', HttpStatus.BAD_REQUEST)
+      throw new HttpException('Wrong id', HttpStatus.BAD_REQUEST);
     }
     if (!dbManager.userExists(id)) {
-      throw new HttpException('Unknown record', HttpStatus.NOT_FOUND)
+      throw new HttpException('Unknown record', HttpStatus.NOT_FOUND);
     }
     return dbManager.getUserById(id);
   }
 
   update(id: string, updateUserDto: UpdateUserDto) {
     if (!isUUID(id)) {
-      throw new HttpException('Wrong id', HttpStatus.BAD_REQUEST)
+      throw new HttpException('Wrong id', HttpStatus.BAD_REQUEST);
     }
     if (!dbManager.userExists(id)) {
-      throw new HttpException('Unknown record', HttpStatus.NOT_FOUND)
+      throw new HttpException('Unknown record', HttpStatus.NOT_FOUND);
     }
     if (!dbManager.checkPassword(id, updateUserDto.oldPassword)) {
-      throw new HttpException('Unknown record', HttpStatus.FORBIDDEN)
+      throw new HttpException('Unknown record', HttpStatus.FORBIDDEN);
     }
-    let userData: Partial<IUserData> = {
+    const userData: Partial<IUserData> = {
       password: updateUserDto.oldPassword,
-      newPassword: updateUserDto.newPassword
+      newPassword: updateUserDto.newPassword,
     };
     return dbManager.updateUser(id, userData);
   }
 
   remove(id: string) {
     if (!isUUID(id)) {
-      throw new HttpException('Wrong id', HttpStatus.BAD_REQUEST)
+      throw new HttpException('Wrong id', HttpStatus.BAD_REQUEST);
     }
     if (!dbManager.userExists(id)) {
-      throw new HttpException('Unknown record', HttpStatus.NOT_FOUND)
+      throw new HttpException('Unknown record', HttpStatus.NOT_FOUND);
     }
     return dbManager.deleteUser(id);
   }

@@ -1,10 +1,18 @@
-import { Controller, Get, Post, Body, Param, Delete, Put, HttpCode, HttpStatus } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Param,
+  Delete,
+  HttpCode,
+  HttpStatus,
+} from '@nestjs/common';
 import { FavoriteService } from './favorite.service';
 import { favTypes } from 'src/_db/Favorites';
 
 @Controller('favs')
 export class FavoriteController {
-  constructor(private readonly favoriteService: FavoriteService) { }
+  constructor(private readonly favoriteService: FavoriteService) {}
 
   @Post('track/:id')
   addTrack(@Param('id') id: string) {

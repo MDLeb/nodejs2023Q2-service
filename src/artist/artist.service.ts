@@ -8,7 +8,7 @@ import { isUUID } from '../utils/isUUID';
 @Injectable()
 export class ArtistService {
   create(createArtistDto: CreateArtistDto) {
-    let artistData: IArtistData = {
+    const artistData: IArtistData = {
       name: createArtistDto.name,
       grammy: createArtistDto.grammy,
     };
@@ -21,22 +21,22 @@ export class ArtistService {
 
   findOne(id: string) {
     if (!isUUID(id)) {
-      throw new HttpException('Wrong id', HttpStatus.BAD_REQUEST)
+      throw new HttpException('Wrong id', HttpStatus.BAD_REQUEST);
     }
     if (!dbManager.artistExists(id)) {
-      throw new HttpException('Unknown record', HttpStatus.NOT_FOUND)
+      throw new HttpException('Unknown record', HttpStatus.NOT_FOUND);
     }
     return dbManager.getArtistById(id);
   }
 
   update(id: string, updateArtistDto: UpdateArtistDto) {
     if (!isUUID(id)) {
-      throw new HttpException('Wrong id', HttpStatus.BAD_REQUEST)
+      throw new HttpException('Wrong id', HttpStatus.BAD_REQUEST);
     }
     if (!dbManager.artistExists(id)) {
-      throw new HttpException('Unknown record', HttpStatus.NOT_FOUND)
+      throw new HttpException('Unknown record', HttpStatus.NOT_FOUND);
     }
-    let artistData: IArtistData = {
+    const artistData: IArtistData = {
       name: updateArtistDto.name ?? null,
       grammy: updateArtistDto.grammy ?? null,
     };
@@ -45,10 +45,10 @@ export class ArtistService {
 
   remove(id: string) {
     if (!isUUID(id)) {
-      throw new HttpException('Wrong id', HttpStatus.BAD_REQUEST)
+      throw new HttpException('Wrong id', HttpStatus.BAD_REQUEST);
     }
     if (!dbManager.artistExists(id)) {
-      throw new HttpException('Unknown record', HttpStatus.NOT_FOUND)
+      throw new HttpException('Unknown record', HttpStatus.NOT_FOUND);
     }
     dbManager.deleteArtist(id);
     dbManager.deleteArtistRelation(id);

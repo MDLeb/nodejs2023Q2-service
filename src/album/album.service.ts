@@ -8,7 +8,7 @@ import { isUUID } from '../utils/isUUID';
 @Injectable()
 export class AlbumService {
   create(createAlbumDto: CreateAlbumDto) {
-    let albumData: IAlbumData = {
+    const albumData: IAlbumData = {
       name: createAlbumDto.name,
       artistId: createAlbumDto.artistId,
       year: createAlbumDto.year,
@@ -22,24 +22,24 @@ export class AlbumService {
 
   findOne(id: string) {
     if (!isUUID(id)) {
-      throw new HttpException('Wrong id', HttpStatus.BAD_REQUEST)
+      throw new HttpException('Wrong id', HttpStatus.BAD_REQUEST);
     }
     if (!dbManager.albumExists(id)) {
-      throw new HttpException('Unknown record', HttpStatus.NOT_FOUND)
+      throw new HttpException('Unknown record', HttpStatus.NOT_FOUND);
     }
-    
+
     return dbManager.getAlbumById(id);
   }
 
   update(id: string, updateAlbumDto: UpdateAlbumDto) {
     if (!isUUID(id)) {
-      throw new HttpException('Wrong id', HttpStatus.BAD_REQUEST)
+      throw new HttpException('Wrong id', HttpStatus.BAD_REQUEST);
     }
     if (!dbManager.albumExists(id)) {
-      throw new HttpException('Unknown record', HttpStatus.NOT_FOUND)
+      throw new HttpException('Unknown record', HttpStatus.NOT_FOUND);
     }
 
-    let albumData: IAlbumData = {
+    const albumData: IAlbumData = {
       name: updateAlbumDto.name ?? null,
       artistId: updateAlbumDto.artistId ?? null,
       year: updateAlbumDto.year ?? null,
@@ -49,10 +49,10 @@ export class AlbumService {
 
   remove(id: string) {
     if (!isUUID(id)) {
-      throw new HttpException('Wrong id', HttpStatus.BAD_REQUEST)
+      throw new HttpException('Wrong id', HttpStatus.BAD_REQUEST);
     }
     if (!dbManager.albumExists(id)) {
-      throw new HttpException('Unknown record', HttpStatus.NOT_FOUND)
+      throw new HttpException('Unknown record', HttpStatus.NOT_FOUND);
     }
 
     dbManager.deleteAlbum(id);

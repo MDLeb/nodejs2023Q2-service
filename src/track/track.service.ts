@@ -8,7 +8,7 @@ import { isUUID } from '../utils/isUUID';
 @Injectable()
 export class TrackService {
   create(createTrackDto: CreateTrackDto) {
-    let trackData: ITrackData = {
+    const trackData: ITrackData = {
       name: createTrackDto.name,
       artistId: createTrackDto.artistId,
       albumId: createTrackDto.albumId,
@@ -23,36 +23,36 @@ export class TrackService {
 
   findOne(id: string) {
     if (!isUUID(id)) {
-      throw new HttpException('Wrong id', HttpStatus.BAD_REQUEST)
+      throw new HttpException('Wrong id', HttpStatus.BAD_REQUEST);
     }
     if (!dbManager.trackExists(id)) {
-      throw new HttpException('Unknown record', HttpStatus.NOT_FOUND)
+      throw new HttpException('Unknown record', HttpStatus.NOT_FOUND);
     }
     return dbManager.getTrackById(id);
   }
 
   update(id: string, updateTrackDto: UpdateTrackDto) {
     if (!isUUID(id)) {
-      throw new HttpException('Wrong id', HttpStatus.BAD_REQUEST)
+      throw new HttpException('Wrong id', HttpStatus.BAD_REQUEST);
     }
     if (!dbManager.trackExists(id)) {
-      throw new HttpException('Unknown record', HttpStatus.NOT_FOUND)
+      throw new HttpException('Unknown record', HttpStatus.NOT_FOUND);
     }
-    let trackData: ITrackData = {
+    const trackData: ITrackData = {
       name: updateTrackDto.name ?? null,
       artistId: updateTrackDto.artistId ?? null,
       albumId: updateTrackDto.albumId ?? null,
       duration: updateTrackDto.duration ?? null,
     };
-    return dbManager.updateTrack(id, trackData)
+    return dbManager.updateTrack(id, trackData);
   }
 
   remove(id: string) {
     if (!isUUID(id)) {
-      throw new HttpException('Wrong id', HttpStatus.BAD_REQUEST)
+      throw new HttpException('Wrong id', HttpStatus.BAD_REQUEST);
     }
     if (!dbManager.trackExists(id)) {
-      throw new HttpException('Unknown record', HttpStatus.NOT_FOUND)
+      throw new HttpException('Unknown record', HttpStatus.NOT_FOUND);
     }
     dbManager.deleteTrackRelation(id);
     return dbManager.deleteTrack(id);

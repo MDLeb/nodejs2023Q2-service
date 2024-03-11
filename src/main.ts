@@ -3,12 +3,12 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common/pipes/validation.pipe';
 import { SwaggerModule } from '@nestjs/swagger';
 import { load } from 'js-yaml';
-import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 
 const PORT = process.env.PORT || 4000;
 const SWAGGER_API_ENDPOINT = '/docs';
-const SWAGGER_YAML_FILE = 'doc/api.yaml'
+const SWAGGER_YAML_FILE = 'doc/api.yaml';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);

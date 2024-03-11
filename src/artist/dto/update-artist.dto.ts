@@ -3,13 +3,13 @@ import { CreateArtistDto } from './create-artist.dto';
 import { IsNotEmpty, IsString, IsBoolean, IsOptional } from 'class-validator';
 
 export class UpdateArtistDto extends PartialType(CreateArtistDto) {
-    @IsNotEmpty()
-    @IsString()
-    @IsOptional()
-    name: string;
+  @IsNotEmpty()
+  @IsString()
+  @IsOptional()
+  name: string;
 
-    @IsNotEmpty()
-    @IsBoolean()
-    @IsOptional()
-    grammy: boolean;
+  @IsNotEmpty()
+  @IsBoolean()
+  @IsOptional()
+  grammy: boolean;
 }
