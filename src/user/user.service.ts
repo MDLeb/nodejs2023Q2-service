@@ -1,8 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import dbManager from 'src/_db/dbManager';
-import { IUserData } from 'src/_db/Users';
 import { isUUID } from '../utils/isUUID';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ParsedUser, User } from './entities/user.entity';

@@ -8,7 +8,7 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { FavoriteService } from './favorite.service';
-import { favTypes } from 'src/_db/Favorites';
+import { favTypes } from './entities/favorite.entity';
 
 @Controller('favs')
 export class FavoriteController {

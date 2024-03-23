@@ -1,5 +1,5 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { favTypes } from 'src/_db/Favorites';
+import { favTypes } from './entities/favorite.entity';
 import { isUUID } from '../utils/isUUID';
 import { PrismaService } from '../prisma/prisma.service'
 import { Favorite, ParsedFavorite } from './entities/favorite.entity';
