@@ -1,60 +1,54 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
-import { ITrackData } from 'src/_db/Tracks';
-import dbManager from 'src/_db/dbManager';
 import { isUUID } from '../utils/isUUID';
+import { PrismaService } from '../prisma/prisma.service'
+import { Track } from './entities/track.entity';
 
 @Injectable()
 export class TrackService {
-  create(createTrackDto: CreateTrackDto) {
-    const trackData: ITrackData = {
-      name: createTrackDto.name,
-      artistId: createTrackDto.artistId,
-      albumId: createTrackDto.albumId,
-      duration: createTrackDto.duration,
-    };
-    return dbManager.addTrack(trackData);
+
+  constructor(private prismaDb: PrismaService) { }
+
+  async create(createTrackDto: CreateTrackDto) {
+    return await this.prismaDb.track.create({ data: createTrackDto as Track });
   }
 
-  findAll() {
-    return dbManager.getAllTracks();
+  async findAll() {
+    return await this.prismaDb.track.findMany();
   }
 
-  findOne(id: string) {
+  async findOne(id: string) {
     if (!isUUID(id)) {
       throw new HttpException('Wrong id', HttpStatus.BAD_REQUEST);
     }
-    if (!dbManager.trackExists(id)) {
+    const track = await this.prismaDb.track.findUnique({ where: { id: id } })
+    if (!track) {
       throw new HttpException('Unknown record', HttpStatus.NOT_FOUND);
     }
-    return dbManager.getTrackById(id);
+    return track;
   }
 
-  update(id: string, updateTrackDto: UpdateTrackDto) {
+  async update(id: string, updateTrackDto: UpdateTrackDto) {
     if (!isUUID(id)) {
       throw new HttpException('Wrong id', HttpStatus.BAD_REQUEST);
     }
-    if (!dbManager.trackExists(id)) {
+    const track = await this.prismaDb.track.findUnique({ where: { id: id } })
+    if (!track) {
       throw new HttpException('Unknown record', HttpStatus.NOT_FOUND);
     }
-    const trackData: ITrackData = {
-      name: updateTrackDto.name ?? null,
-      artistId: updateTrackDto.artistId ?? null,
-      albumId: updateTrackDto.albumId ?? null,
-      duration: updateTrackDto.duration ?? null,
-    };
-    return dbManager.updateTrack(id, trackData);
+
+    return await this.prismaDb.track.update({ where: { id: id }, data: updateTrackDto });
   }
 
-  remove(id: string) {
+  async remove(id: string) {
     if (!isUUID(id)) {
       throw new HttpException('Wrong id', HttpStatus.BAD_REQUEST);
     }
-    if (!dbManager.trackExists(id)) {
+    const track = await this.prismaDb.track.findUnique({ where: { id: id } })
+    if (!track) {
       throw new HttpException('Unknown record', HttpStatus.NOT_FOUND);
     }
-    dbManager.deleteTrackRelation(id);
-    return dbManager.deleteTrack(id);
+    return await this.prismaDb.track.delete({ where: { id: id } });
   }
 }

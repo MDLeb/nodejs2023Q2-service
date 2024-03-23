@@ -1,1 +1,4 @@
-export class Artist {}
+export class Artist {
+    name: string;
+    grammy: boolean;  
+}

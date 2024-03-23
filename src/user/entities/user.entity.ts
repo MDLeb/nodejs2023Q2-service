@@ -1,1 +1,5 @@
-export class User {}
+export class User {
+    login: string;
+    password: string;
+    newPassword?: string;
+}

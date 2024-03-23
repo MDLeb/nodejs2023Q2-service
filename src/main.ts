@@ -16,6 +16,7 @@ async function bootstrap() {
 
   const document = load(readFileSync(resolve(SWAGGER_YAML_FILE), 'utf8'));
   SwaggerModule.setup(SWAGGER_API_ENDPOINT, app, document);
+  
   await app.listen(PORT);
 }
 bootstrap();

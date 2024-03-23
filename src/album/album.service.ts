@@ -1,61 +1,60 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateAlbumDto } from './dto/create-album.dto';
 import { UpdateAlbumDto } from './dto/update-album.dto';
-import dbManager from 'src/_db/dbManager';
-import { IAlbumData } from 'src/_db/Albums';
 import { isUUID } from '../utils/isUUID';
+import { PrismaService } from '../prisma/prisma.service'
+import { Album } from './entities/album.entity';
 
 @Injectable()
 export class AlbumService {
-  create(createAlbumDto: CreateAlbumDto) {
-    const albumData: IAlbumData = {
-      name: createAlbumDto.name,
-      artistId: createAlbumDto.artistId,
-      year: createAlbumDto.year,
-    };
-    return dbManager.addAlbum(albumData);
+
+  constructor(private prismaDb: PrismaService) { }
+
+  async create(createAlbumDto: CreateAlbumDto) {
+    return await this.prismaDb.album.create({ data: createAlbumDto as Album})
   }
 
-  findAll() {
-    return dbManager.getAllAlbums();
+  async findAll() {
+    return await this.prismaDb.album.findMany();
   }
 
-  findOne(id: string) {
+  async findOne(id: string) {
     if (!isUUID(id)) {
       throw new HttpException('Wrong id', HttpStatus.BAD_REQUEST);
     }
-    if (!dbManager.albumExists(id)) {
+    const album = await this.prismaDb.album.findUnique({
+      where: { id: id }
+    })
+    if (!album) {
       throw new HttpException('Unknown record', HttpStatus.NOT_FOUND);
     }
-
-    return dbManager.getAlbumById(id);
+    return album;
   }
 
-  update(id: string, updateAlbumDto: UpdateAlbumDto) {
+  async update(id: string, updateAlbumDto: UpdateAlbumDto) {
     if (!isUUID(id)) {
       throw new HttpException('Wrong id', HttpStatus.BAD_REQUEST);
     }
-    if (!dbManager.albumExists(id)) {
+    const album = await this.prismaDb.album.findUnique({
+      where: { id: id }
+    })
+    if (!album) {
       throw new HttpException('Unknown record', HttpStatus.NOT_FOUND);
     }
-
-    const albumData: IAlbumData = {
-      name: updateAlbumDto.name ?? null,
-      artistId: updateAlbumDto.artistId ?? null,
-      year: updateAlbumDto.year ?? null,
-    };
-    return dbManager.updateAlbum(id, albumData);
+    return await this.prismaDb.album.update({ where: { id }, data: updateAlbumDto })
   }
 
-  remove(id: string) {
+  async remove(id: string) {
     if (!isUUID(id)) {
       throw new HttpException('Wrong id', HttpStatus.BAD_REQUEST);
     }
-    if (!dbManager.albumExists(id)) {
+    const album = await this.prismaDb.album.findUnique({
+      where: { id: id }
+    })
+    if (!album) {
       throw new HttpException('Unknown record', HttpStatus.NOT_FOUND);
     }
 
-    dbManager.deleteAlbum(id);
-    dbManager.deleteAlbumRelation(id);
+    await this.prismaDb.album.delete({ where: { id } });
   }
 }
