@@ -2,58 +2,89 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { favTypes } from 'src/_db/Favorites';
 import { isUUID } from '../utils/isUUID';
 import { PrismaService } from '../prisma/prisma.service'
-import { Favorite } from './entities/favorite.entity';
-import { Album } from 'src/_db/Albums';
+import { Favorite, ParsedFavorite } from './entities/favorite.entity';
 
 @Injectable()
 export class FavoriteService {
 
+  private temp_id: string;
+
   constructor(private prismaDb: PrismaService) { }
+
+  private _parseFavs(fav: any) {
+    return new ParsedFavorite(fav)
+  }
+
+  private async _createRecord() {
+    const record = await this.prismaDb.favorites.create({
+      data: {}
+    });
+    this.temp_id = record.id;
+  }
 
   async create(id: string, type: favTypes) {
     if (!isUUID(id)) {
       throw new HttpException('Wrong id', HttpStatus.BAD_REQUEST);
     }
-    if (!await this.prismaDb.favorites.findUnique({ where: { id: id } })) {
-      return 'Record is already in favorites';
-    }
+
+    if (!this.temp_id) await this._createRecord();
+
+    // if (!await this.prismaDb.favorites.findUnique({ where: { id: this.temp_id } })) {
+    //   return 'Record is already in favorites';
+    // }
     switch (type as any) {
       case 0: //Album
-        const album = await this.prismaDb.favorites.findMany({
-          select: {albums: true}, where: {id: id},
-        });
-        console.log(album);
-        
-        if (album) {
+        const album = await this.prismaDb.album.findUnique({ where: { id: id } })
+        if (!album) {
           throw new HttpException(
             'Unknown record',
             HttpStatus.UNPROCESSABLE_ENTITY,
           );
         }
+        // const albumInFavs = await this.prismaDb.favorites.findUnique({
+        //   where: {id: this.temp_id},
+        //   // select: { albums: true },
+        // });
+
+        await this.prismaDb.favorites.update({
+          where: { id: this.temp_id }, data: {
+            albums: {
+              set: album
+            }
+          }
+        })
         break;
       case 1: //Artist
-      const artist = await this.prismaDb.favorites.findMany({
-        select: {artists: true}, where: {id: id},
-      });
-      console.log(artist);
-        if (artist) {
+        const artist = await this.prismaDb.artist.findUnique({ where: { id: id } })
+        if (!artist) {
           throw new HttpException(
             'Unknown record',
             HttpStatus.UNPROCESSABLE_ENTITY,
           );
         }
+        await this.prismaDb.favorites.update({
+          where: { id: this.temp_id }, data: {
+            artists: {
+              set: artist
+            }
+          }
+        })
         break;
       case 2: //Track
-      const track = await this.prismaDb.favorites.findMany({
-        select: {tracks: true}, where: {id: id},
-      });
-      console.log(artist);
-        if (track) {
+        const track = await this.prismaDb.track.findUnique({ where: { id: id } })
+        if (!track) {
           throw new HttpException(
             'Unknown record',
             HttpStatus.UNPROCESSABLE_ENTITY,
           );
         }
+        await this.prismaDb.favorites.update({
+          where: { id: this.temp_id }, data: {
+            tracks: {
+              set: track
+            }
+          }
+        })
         break;
       default:
         break;
@@ -63,29 +94,51 @@ export class FavoriteService {
   }
 
   async findAll() {
-    // return await this.prismaDb.favorites.findMany();
+    if (!this.temp_id) await this._createRecord();
+    const fav = await this.prismaDb.favorites.findUnique({
+      where: { id: this.temp_id }, include: {
+        albums: true,
+        artists: true,
+        tracks: true
+      }
+    });
+    return this._parseFavs(fav);
   }
 
-  async findOne(id: string) {
-    // if (!isUUID(id)) {
-    //   throw new HttpException('Wrong id', HttpStatus.BAD_REQUEST);
-    // }
-    // const item = await this.prismaDb.favorites.findUnique({ where: { id: id } });
-    // if (item === null) {
-    //   throw new HttpException('Unknown record', HttpStatus.NOT_FOUND);
-    // }
-    // return item;
-  }
+  async remove(id: string, type: favTypes) {
+    if (!this.temp_id) await this._createRecord();
 
-  async remove(id: string) {
-    // if (!isUUID(id)) {
-    //   throw new HttpException('Wrong id', HttpStatus.BAD_REQUEST);
-    // }
-    // const result = await this.prismaDb.favorites.delete({ where: { id: id } });
-
-    // if (!result) {
-    //   throw new HttpException('Unknown record', HttpStatus.NOT_FOUND);
-    // }
-    // return;
+    switch (type as any) {
+      case 0: //Albums
+        await this.prismaDb.favorites.update({
+          where: { id: this.temp_id },
+          data: {
+            albums: {
+              disconnect: { id: id }
+            }
+          }
+        });
+        break;
+      case 1: //Artists
+        await this.prismaDb.favorites.update({
+          where: { id: this.temp_id },
+          data: {
+            artists: {
+              disconnect: { id: id }
+            }
+          }
+        });
+        break;
+      case 2: //Tracks
+        await this.prismaDb.favorites.update({
+          where: { id: this.temp_id },
+          data: {
+            tracks: {
+              disconnect: { id: id }
+            }
+          }
+        });
+        break;
+    }
   }
 }

@@ -49,6 +49,6 @@ export class TrackService {
     if (!track) {
       throw new HttpException('Unknown record', HttpStatus.NOT_FOUND);
     }
-    return await this.prismaDb.track.delete({ where: { id: id } });
+    return await this.prismaDb.track.delete({ where: { id: id }, include: {Favorites: true} });
   }
 }

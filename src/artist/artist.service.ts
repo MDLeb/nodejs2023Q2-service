@@ -48,6 +48,6 @@ export class ArtistService {
     if (!artist) {
       throw new HttpException('Unknown record', HttpStatus.NOT_FOUND);
     }
-    await this.prismaDb.artist.delete({ where: { id: id } });
+    await this.prismaDb.artist.delete({ where: { id: id }, include: {Favorites: true} });
   }
 }

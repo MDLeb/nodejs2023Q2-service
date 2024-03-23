@@ -55,6 +55,8 @@ export class AlbumService {
       throw new HttpException('Unknown record', HttpStatus.NOT_FOUND);
     }
 
-    await this.prismaDb.album.delete({ where: { id } });
+    
+
+    await this.prismaDb.album.delete({ where: { id } , include: {Favorites: true}});
   }
 }
