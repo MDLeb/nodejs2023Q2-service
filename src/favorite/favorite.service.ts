@@ -1,23 +1,22 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { favTypes } from './entities/favTypes';
 import { isUUID } from '../utils/isUUID';
-import { PrismaService } from '../prisma/prisma.service'
-import { Favorite, ParsedFavorite } from './entities/favorite.entity';
+import { PrismaService } from '../prisma/prisma.service';
+import { ParsedFavorite } from './entities/favorite.entity';
 
 @Injectable()
 export class FavoriteService {
-
   private temp_id: string;
 
-  constructor(private prismaDb: PrismaService) { }
+  constructor(private prismaDb: PrismaService) {}
 
   private _parseFavs(fav: any) {
-    return new ParsedFavorite(fav)
+    return new ParsedFavorite(fav);
   }
 
   private async _createRecord() {
     const record = await this.prismaDb.favorites.create({
-      data: {}
+      data: {},
     });
     this.temp_id = record.id;
   }
@@ -34,7 +33,9 @@ export class FavoriteService {
     // }
     switch (type as any) {
       case 0: //Album
-        const album = await this.prismaDb.album.findUnique({ where: { id: id } })
+        const album = await this.prismaDb.album.findUnique({
+          where: { id: id },
+        });
         if (!album) {
           throw new HttpException(
             'Unknown record',
@@ -47,15 +48,18 @@ export class FavoriteService {
         // });
 
         await this.prismaDb.favorites.update({
-          where: { id: this.temp_id }, data: {
+          where: { id: this.temp_id },
+          data: {
             albums: {
-              set: album
-            }
-          }
-        })
+              set: album,
+            },
+          },
+        });
         break;
       case 1: //Artist
-        const artist = await this.prismaDb.artist.findUnique({ where: { id: id } })
+        const artist = await this.prismaDb.artist.findUnique({
+          where: { id: id },
+        });
         if (!artist) {
           throw new HttpException(
             'Unknown record',
@@ -63,15 +67,18 @@ export class FavoriteService {
           );
         }
         await this.prismaDb.favorites.update({
-          where: { id: this.temp_id }, data: {
+          where: { id: this.temp_id },
+          data: {
             artists: {
-              set: artist
-            }
-          }
-        })
+              set: artist,
+            },
+          },
+        });
         break;
       case 2: //Track
-        const track = await this.prismaDb.track.findUnique({ where: { id: id } })
+        const track = await this.prismaDb.track.findUnique({
+          where: { id: id },
+        });
         if (!track) {
           throw new HttpException(
             'Unknown record',
@@ -79,12 +86,13 @@ export class FavoriteService {
           );
         }
         await this.prismaDb.favorites.update({
-          where: { id: this.temp_id }, data: {
+          where: { id: this.temp_id },
+          data: {
             tracks: {
-              set: track
-            }
-          }
-        })
+              set: track,
+            },
+          },
+        });
         break;
       default:
         break;
@@ -96,11 +104,12 @@ export class FavoriteService {
   async findAll() {
     if (!this.temp_id) await this._createRecord();
     const fav = await this.prismaDb.favorites.findUnique({
-      where: { id: this.temp_id }, include: {
+      where: { id: this.temp_id },
+      include: {
         albums: true,
         artists: true,
-        tracks: true
-      }
+        tracks: true,
+      },
     });
     return this._parseFavs(fav);
   }
@@ -114,9 +123,9 @@ export class FavoriteService {
           where: { id: this.temp_id },
           data: {
             albums: {
-              disconnect: { id: id }
-            }
-          }
+              disconnect: { id: id },
+            },
+          },
         });
         break;
       case 1: //Artists
@@ -124,9 +133,9 @@ export class FavoriteService {
           where: { id: this.temp_id },
           data: {
             artists: {
-              disconnect: { id: id }
-            }
-          }
+              disconnect: { id: id },
+            },
+          },
         });
         break;
       case 2: //Tracks
@@ -134,9 +143,9 @@ export class FavoriteService {
           where: { id: this.temp_id },
           data: {
             tracks: {
-              disconnect: { id: id }
-            }
-          }
+              disconnect: { id: id },
+            },
+          },
         });
         break;
     }

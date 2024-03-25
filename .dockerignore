@@ -1,4 +1,5 @@
 README.md
-dist
-node-modules
+.git
+/dist
+/node_modules
 .env
