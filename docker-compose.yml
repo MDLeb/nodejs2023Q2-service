@@ -2,7 +2,8 @@ version: '3.8'
 services:
 
   postgres:
-    image: postgres
+    image: mdleb/postgres
+    container_name: postgres
     build:
       context: ./postgres_db
       dockerfile: Dockerfile
@@ -18,6 +19,7 @@ services:
       - '${POSTGRES_PORT}:${POSTGRES_PORT}'
 
   app:
+    image: mdleb/nodejs2023q2-service-app
     build:
       context: .
       dockerfile: Dockerfile
