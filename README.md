@@ -5,7 +5,13 @@
 ```
 npm install
 ```
-- Change extension of .env.example file to .env 
+- Change extension of .env.example file to .env and add the following variables:
+POSTGRES_PORT=5432
+POSTGRES_USER=myuser
+POSTGRES_PASSWORD=mypassword
+POSTGRES_HOST=postgres
+DATABASE_URL="postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/mydb?schema=public"
+
 
 ## Running application
 
