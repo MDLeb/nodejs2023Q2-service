@@ -4,10 +4,12 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { isUUID } from '../utils/isUUID';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ParsedUser, User } from './entities/user.entity';
+import * as bcrypt from 'bcrypt';
 
+const saltRounds = process.env.CRYPT_SALT;
 @Injectable()
 export class UserService {
-  constructor(private prismaDb: PrismaService) {}
+  constructor(private prismaDb: PrismaService) { }
 
   private _parseUser(user: any) {
     return new ParsedUser(user);
@@ -17,6 +19,7 @@ export class UserService {
     const user = await this.prismaDb.user.create({
       data: createUserDto as User,
     });
+    user.password = await bcrypt.hash(user.password, saltRounds);
     return this._parseUser(user);
   }
 
@@ -44,13 +47,14 @@ export class UserService {
     if (!user) {
       throw new HttpException('Unknown record', HttpStatus.NOT_FOUND);
     }
-    if (user.password !== updateUserDto.oldPassword) {
+    const checkPassword = await bcrypt.compare(updateUserDto.oldPassword, user.password);
+    if (!checkPassword) {
       throw new HttpException('Unknown record', HttpStatus.FORBIDDEN);
     }
 
     const newUser = await this.prismaDb.user.update({
       where: { id: id },
-      data: { password: updateUserDto.newPassword, version: { increment: 1 } },
+      data: { password: await bcrypt.hash(updateUserDto.newPassword, saltRounds), version: { increment: 1 } },
     });
 
     return this._parseUser(newUser);
