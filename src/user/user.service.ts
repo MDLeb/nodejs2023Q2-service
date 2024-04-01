@@ -32,7 +32,7 @@ export class UserService {
   }
 
   async findOne(id: string) {
-    throw new Error('TEST UNEXPECTED ERROR');
+    // throw new Error('TEST UNEXPECTED ERROR');
     if (!isUUID(id)) {
       throw new HttpException('Wrong id', HttpStatus.BAD_REQUEST);
     }
