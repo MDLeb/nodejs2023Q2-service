@@ -5,26 +5,33 @@ import * as path from 'node:path'
 export class CustomLogger extends ConsoleLogger {
   private level: LogLevel[] = [];
   private maxFileSize: number;
-  private counters: Map<LogLevel, number>;
-  private errorCounter: number;
+  private counters: Map<LogLevel, number> = new Map();
 
   constructor(name?: string) {
     super();
     this.maxFileSize = +process.env.LOGGER_FILE_SIZE
-    const envLevels = process.env.LOGGER_LEVEL;
+    let envLevels = process.env.LOGGER_LEVEL
+      .replace('[', '')
+      .replace(']', '')
+      .split(', ');
+
     if (Array.isArray(envLevels)) {
       envLevels.forEach(level => {
-        switch (level) {
-          case 'log' || 'error' || 'warn' || 'debug' || 'verbose' || 'fatal':
-            this.level.push(level as LogLevel);
-            this.counters.set(level, 1);
-            break;
-          default:
-            break;
+        if (['log', 'error', 'warn', 'debug', 'verbose', 'fatal'].includes(level)) {
+          this.level.push(level as LogLevel);
+          this.counters.set(level as LogLevel, 1);
         }
       });
 
     }
+
+    process.on('unhandledRejection', (reason: unknown) => {
+      this.error('unhandled Rejection', reason);
+    });
+
+    process.on('uncaughtException', (error: Error) => {
+      this.error('uncaught Exception', error.stack);
+    });
 
   }
 
@@ -32,9 +39,9 @@ export class CustomLogger extends ConsoleLogger {
     if (!this.level.includes('log')) return;
     this._writeLogs('log', this._logMessage(message));
   }
-  error(message: any) {
+  error(message: any, stack?: any) {
     if (!this.level.includes('error')) return;
-    this._writeLogs('error', this._logMessage(message));
+    this._writeLogs('error', this._logMessage(message, stack));
   }
   warn(message: any) {
     if (!this.level.includes('warn')) return;
@@ -58,7 +65,8 @@ export class CustomLogger extends ConsoleLogger {
     const logFolderPath = path.resolve('/app/dist', 'logs')
     await fs.mkdir(logFolderPath, { recursive: true });
 
-    let counter = this.counters.get(logType);
+    let counter = this.counters.get(logType) ?? 0;
+
     let logFilePath = path.resolve(logFolderPath, `${logType}_${counter}.txt`)
 
     fs.access(logFilePath)
@@ -66,22 +74,26 @@ export class CustomLogger extends ConsoleLogger {
         fs.stat(logFilePath)
           .then(stats => {
             if (stats.size > this.maxFileSize) {
-              counter++;
+              counter += 1;
               this.counters.set(logType, counter);
               logFilePath = path.resolve(logFolderPath, `${logType}_${counter}.txt`)
             }
           })
       })
-      .catch(err => {
-        console.log(err);
-      })
+      .catch(err => { })
 
 
     await fs.writeFile(logFilePath, data, { flag: 'a' });
 
   }
 
-  private _logMessage(message: string) {
-    return `${new Date()}: ${message}`
+  private _logMessage(message: string, stack?: any) {
+
+    let msg = `${new Date().toISOString()}: ${message}`
+
+    if (stack) {
+      msg += `_${stack instanceof Error ? stack.stack : stack}`
+    }
+    return msg;
   }
 }

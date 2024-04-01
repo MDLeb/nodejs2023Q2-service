@@ -9,7 +9,7 @@ import * as bcrypt from 'bcrypt';
 const saltRounds = +process.env.CRYPT_SALT;
 @Injectable()
 export class UserService {
-  constructor(private prismaDb: PrismaService) {}
+  constructor(private prismaDb: PrismaService) { }
 
   private _parseUser(user: any) {
     return new ParsedUser(user);
@@ -29,6 +29,7 @@ export class UserService {
   }
 
   async findOne(id: string) {
+    throw new Error('TEST UNEXPECTED ERROR');
     if (!isUUID(id)) {
       throw new HttpException('Wrong id', HttpStatus.BAD_REQUEST);
     }

@@ -1,4 +1,4 @@
-import { NestFactory } from '@nestjs/core';
+import { HttpAdapterHost, NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common/pipes/validation.pipe';
 import { SwaggerModule } from '@nestjs/swagger';
@@ -12,10 +12,12 @@ const SWAGGER_API_ENDPOINT = '/docs';
 const SWAGGER_YAML_FILE = 'doc/api.yaml';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, {logger: new CustomLogger()});
-  
+  const app = await NestFactory.create(AppModule, { logger: new CustomLogger() });
+  const logger = app.get(CustomLogger);
+
   app.useGlobalPipes(new ValidationPipe());
-  app.useLogger(app.get(CustomLogger));
+  app.useLogger(logger);
+  app.useGlobalFilters(app.get(HttpAdapterHost));
 
   const document = load(readFileSync(resolve(SWAGGER_YAML_FILE), 'utf8'));
   SwaggerModule.setup(SWAGGER_API_ENDPOINT, app, document);

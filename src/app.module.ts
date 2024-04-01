@@ -11,6 +11,7 @@ import { AuthModule } from './auth/auth.module';
 import { LoggerMiddleware } from './logger/logger.middleware';
 import { LoggerModule } from './logger/logger.module';
 import { APP_FILTER } from '@nestjs/core';
+import { HttpExceptionFilter } from './filters/httpExceptionFilter';
 
 @Module({
   imports: [
