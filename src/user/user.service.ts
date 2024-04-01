@@ -9,14 +9,17 @@ import * as bcrypt from 'bcrypt';
 const saltRounds = +process.env.CRYPT_SALT;
 @Injectable()
 export class UserService {
-  constructor(private prismaDb: PrismaService) { }
+  constructor(private prismaDb: PrismaService) {}
 
   private _parseUser(user: any) {
     return new ParsedUser(user);
   }
 
   async create(createUserDto: CreateUserDto) {
-    createUserDto.password = await bcrypt.hash(createUserDto.password, saltRounds);
+    createUserDto.password = await bcrypt.hash(
+      createUserDto.password,
+      saltRounds,
+    );
     const user = await this.prismaDb.user.create({
       data: createUserDto as User,
     });

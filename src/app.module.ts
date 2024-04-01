@@ -22,13 +22,16 @@ import { HttpExceptionFilter } from './filters/httpExceptionFilter';
     TrackModule,
     PrismaModule,
     AuthModule,
-    LoggerModule
+    LoggerModule,
   ],
   controllers: [AppController],
-  providers: [AppService, {
-    provide: APP_FILTER,
-    useClass: HttpExceptionFilter,
-  },],
+  providers: [
+    AppService,
+    {
+      provide: APP_FILTER,
+      useClass: HttpExceptionFilter,
+    },
+  ],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

@@ -1,5 +1,8 @@
 import {
-  ExceptionFilter, Catch, ArgumentsHost, HttpException,
+  ExceptionFilter,
+  Catch,
+  ArgumentsHost,
+  HttpException,
   HttpStatus,
   Logger,
 } from '@nestjs/common';
@@ -8,15 +11,17 @@ import { HttpAdapterHost } from '@nestjs/core';
 @Catch()
 export class HttpExceptionFilter implements ExceptionFilter {
   private readonly logger = new Logger(HttpExceptionFilter.name);
-  constructor(private readonly httpAdapterHost: HttpAdapterHost) { }
+  constructor(private readonly httpAdapterHost: HttpAdapterHost) {}
 
   catch(exception: unknown, host: ArgumentsHost): void {
     const { httpAdapter } = this.httpAdapterHost;
     const context = host.switchToHttp();
     const response = context.getResponse<Response>();
     const req = context.getRequest<Request>();
-    const status = (exception as HttpException).getStatus() ?? HttpStatus.INTERNAL_SERVER_ERROR;
-    const msg = (exception as HttpException).message ?? 'Internal server error'
+    const status =
+      (exception as HttpException).getStatus() ??
+      HttpStatus.INTERNAL_SERVER_ERROR;
+    const msg = (exception as HttpException).message ?? 'Internal server error';
     const path = httpAdapter.getRequestUrl(req);
     const timestamp = new Date().toISOString();
 

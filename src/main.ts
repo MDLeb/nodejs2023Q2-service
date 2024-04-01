@@ -12,7 +12,9 @@ const SWAGGER_API_ENDPOINT = '/docs';
 const SWAGGER_YAML_FILE = 'doc/api.yaml';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, { logger: new CustomLogger() });
+  const app = await NestFactory.create(AppModule, {
+    logger: new CustomLogger(),
+  });
   const logger = app.get(CustomLogger);
 
   app.useGlobalPipes(new ValidationPipe());

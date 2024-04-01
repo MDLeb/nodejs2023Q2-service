@@ -1,4 +1,9 @@
-import { Injectable, HttpException, HttpStatus, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  HttpException,
+  HttpStatus,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from '../user/user.service';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
@@ -14,7 +19,7 @@ export class AuthService {
 
   async login(user: CreateUserDto) {
     const dbUser = await this.userService.getByLogin(user.login);
-    
+
     const checkPassword = await bcrypt.compare(user.password, dbUser.password);
     if (!dbUser || !checkPassword) {
       throw new HttpException(
