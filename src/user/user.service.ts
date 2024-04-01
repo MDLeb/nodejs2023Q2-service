@@ -6,20 +6,20 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { ParsedUser, User } from './entities/user.entity';
 import * as bcrypt from 'bcrypt';
 
-const saltRounds = process.env.CRYPT_SALT;
+const saltRounds = +process.env.CRYPT_SALT;
 @Injectable()
 export class UserService {
-  constructor(private prismaDb: PrismaService) { }
+  constructor(private prismaDb: PrismaService) {}
 
   private _parseUser(user: any) {
     return new ParsedUser(user);
   }
 
   async create(createUserDto: CreateUserDto) {
+    createUserDto.password = await bcrypt.hash(createUserDto.password, saltRounds);
     const user = await this.prismaDb.user.create({
       data: createUserDto as User,
     });
-    user.password = await bcrypt.hash(user.password, saltRounds);
     return this._parseUser(user);
   }
 
@@ -47,14 +47,20 @@ export class UserService {
     if (!user) {
       throw new HttpException('Unknown record', HttpStatus.NOT_FOUND);
     }
-    const checkPassword = await bcrypt.compare(updateUserDto.oldPassword, user.password);
+    const checkPassword = await bcrypt.compare(
+      updateUserDto.oldPassword,
+      user.password,
+    );
     if (!checkPassword) {
       throw new HttpException('Unknown record', HttpStatus.FORBIDDEN);
     }
 
     const newUser = await this.prismaDb.user.update({
       where: { id: id },
-      data: { password: await bcrypt.hash(updateUserDto.newPassword, saltRounds), version: { increment: 1 } },
+      data: {
+        password: await bcrypt.hash(updateUserDto.newPassword, saltRounds),
+        version: { increment: 1 },
+      },
     });
 
     return this._parseUser(newUser);
@@ -69,5 +75,15 @@ export class UserService {
       throw new HttpException('Unknown record', HttpStatus.NOT_FOUND);
     }
     return await this.prismaDb.user.delete({ where: { id: id } });
+  }
+
+  async getByLogin(login: string) {
+    const user = await this.prismaDb.user.findFirst({
+      where: { login: login },
+    });
+    if (!user) {
+      throw new HttpException('Unknown user', HttpStatus.NOT_FOUND);
+    }
+    return user;
   }
 }

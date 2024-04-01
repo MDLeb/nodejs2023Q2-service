@@ -24,6 +24,11 @@ services:
       context: .
       dockerfile: Dockerfile
     restart: always
+    develop:
+      watch:
+        - path: .
+          target: .
+          action: sync+restart
     env_file:
       - .env
     networks:
