@@ -4,7 +4,7 @@ import { CustomLogger } from './logger.service';
 
 @Injectable()
 export class LoggerMiddleware implements NestMiddleware {
-  private logger = new CustomLogger('HTTP');
+  private logger = new Logger(LoggerMiddleware.name);
 
   use(request: Request, response: Response, next: NextFunction): void {
     const { ip, method, originalUrl } = request;
