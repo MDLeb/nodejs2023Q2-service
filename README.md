@@ -18,9 +18,9 @@ in your browser OpenAPI documentation by typing http://localhost:4000/docs/
 
 You can find logs in the files of the container named 'app', in the app/dist/log
 
-![steps](https://ibb.co/GCvdh5Z)
-![steps](https://ibb.co/cyXw3Pq)
-![steps](https://ibb.co/wQ0ZvWh)
+[steps](https://ibb.co/GCvdh5Z)
+[steps](https://ibb.co/cyXw3Pq)
+[steps](https://ibb.co/wQ0ZvWh)
 
 ## Testing
 
